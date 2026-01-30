@@ -16,8 +16,10 @@ export async function POST(
 
   const org = await findOrgBySlug(orgSlug);
   if (!org) {
-    // Generic: do not leak org existence
-    return NextResponse.redirect(new URL(`/o/${encodeURIComponent(orgSlug)}/admin/login`, req.url), { status: 303 });
+    const url = new URL(`/o/${encodeURIComponent(orgSlug)}/login`, req.url);
+    url.searchParams.set("error", "invalid");
+    return NextResponse.redirect(url, { status: 303 });
+
   }
 
   const inputHash = crypto
@@ -26,7 +28,10 @@ export async function POST(
     .digest("hex");
 
   if (inputHash !== org.admin_password_hash) {
-    return NextResponse.redirect(new URL(`/o/${encodeURIComponent(orgSlug)}/admin/login`, req.url), { status: 303 });
+    const url = new URL(`/o/${encodeURIComponent(orgSlug)}/login`, req.url);
+    url.searchParams.set("error", "invalid");
+    return NextResponse.redirect(url, { status: 303 });
+
   }
 
   const { rawToken, expiresAt } = await createAdminSession(org.id);

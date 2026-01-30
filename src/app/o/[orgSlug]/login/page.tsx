@@ -4,7 +4,9 @@ import { redirect, notFound } from "next/navigation";
 
 type Props = {
   params: Promise<{ orgSlug: string }>;
+  searchParams: Promise<{ error?: string }>;
 };
+
 
 export default async function AdminLoginPage(props: Props) {
   const { orgSlug } = await props.params;
@@ -13,6 +15,8 @@ export default async function AdminLoginPage(props: Props) {
   if (!org) notFound();
 
   const session = await getSession();
+
+  const { error } = await props.searchParams;
 
   if (
     session &&
@@ -27,7 +31,11 @@ export default async function AdminLoginPage(props: Props) {
     <main style={{ padding: 16 }}>
       <h1>Admin login</h1>
 
-      <form method="POST" action={`/api/o/${orgSlug}/admin/login`}>
+      {error === "invalid" && (
+        <p style={{ color: "red" }}>Invalid password</p>
+      )}
+
+      <form method="POST" action={`/api/o/${orgSlug}/login`}>
         <div>
           <label>
             Password

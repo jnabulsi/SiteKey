@@ -4,10 +4,13 @@ import { notFound } from "next/navigation";
 
 type Props = {
   params: Promise<{ orgSlug: string; assetId: string }>;
+  searchParams: Promise<{ error?: string }>;
 };
 
 export default async function EditAssetPage(props: Props) {
   const { orgSlug, assetId } = await props.params;
+  const { error } = await props.searchParams;
+
 
   const org = await findOrgBySlug(orgSlug);
   if (!org) notFound();
@@ -20,6 +23,10 @@ export default async function EditAssetPage(props: Props) {
   return (
     <>
       <h1>Edit Asset</h1>
+
+      {error === "name" && (
+        <p style={{ color: "red" }}>Name is required</p>
+      )}
 
       <p>
         <a href={`/a/${asset.public_token}`} target="_blank" rel="noreferrer">

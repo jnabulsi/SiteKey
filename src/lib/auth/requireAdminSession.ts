@@ -11,7 +11,7 @@ export async function requireAdminSession(orgId: string, orgSlug: string) {
     session.expires_at > new Date();
 
   if (!ok) {
-    redirect(`/o/${encodeURIComponent(orgSlug)}/admin/login`);
+    redirect(`/o/${encodeURIComponent(orgSlug)}/login`);
   }
 
   return session;

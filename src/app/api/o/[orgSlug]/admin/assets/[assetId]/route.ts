@@ -38,8 +38,14 @@ export async function POST(
   const isPublic = formData.get("is_public") === "on";
 
   if (!name) {
-    return NextResponse.json({ error: "Name is required" }, { status: 400 });
+    const url = new URL(
+      `/o/${orgSlug}/admin/assets/${assetId}`,
+      req.url
+    );
+    url.searchParams.set("error", "name");
+    return NextResponse.redirect(url, { status: 303 });
   }
+
 
   const updated = await prisma.asset.updateMany({
     where: { id: assetId, org_id: org.id },

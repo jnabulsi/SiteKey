@@ -25,7 +25,16 @@ export default async function AdminLayout(props: Props) {
           <a href={`/o/${orgSlug}/admin`}>Home</a>
           <a href={`/o/${orgSlug}/admin/assets`}>Assets</a>
           <a href={`/o/${orgSlug}/admin/settings`}>Settings</a>
+
+          <form
+            method="POST"
+            action={`/api/logout?next=/o/${encodeURIComponent(orgSlug)}/login`}
+            style={{ display: "inline" }}
+          >
+            <button type="submit">Logout</button>
+          </form>
         </nav>
+
       </header>
 
       {children}
