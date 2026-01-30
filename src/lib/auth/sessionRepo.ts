@@ -41,6 +41,14 @@ export async function createFieldSession(orgId: string) {
   });
 }
 
+export async function createAdminSession(orgId: string) {
+  return createSession({
+    orgId,
+    sessionType: "admin",
+    ttlDays: FIELD_SESSION_TTL_DAYS,
+  });
+}
+
 export async function findValidSessionByRawToken(rawToken: string) {
   const tokenHash = hashSessionToken(rawToken);
   const session = await prisma.session.findUnique({
