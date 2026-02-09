@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db/prisma";
 import { findOrgBySlug } from "@/lib/org/orgRepo";
+import { listReadyDocumentsForAsset } from "@/lib/documents/documentRepo";
 import { notFound } from "next/navigation";
+import DocumentUploadForm from "./DocumentUploadForm";
 
 type Props = {
   params: Promise<{ orgSlug: string; assetId: string }>;
@@ -79,7 +81,38 @@ export default async function EditAssetPage(props: Props) {
         <input type="hidden" name="action" value="delete" />
         <button type="submit">Delete asset</button>
       </form>
+
+      <hr />
+
+      <DocumentUploadForm orgSlug={orgSlug} assetId={assetId} />
+
+      <hr />
+
+      <h2>Documents</h2>
+      <DocumentList assetId={assetId} />
     </>
+  );
+}
+
+async function DocumentList({ assetId }: { assetId: string }) {
+  const documents = await listReadyDocumentsForAsset(assetId);
+
+  if (documents.length === 0) {
+    return <p>No documents yet.</p>;
+  }
+
+  return (
+    <ul>
+      {documents.map((doc) => (
+        <li key={doc.id}>
+          <a href={`/d/${doc.id}`} target="_blank" rel="noreferrer">
+            {doc.title}
+          </a>
+          {doc.doc_type && <> — {doc.doc_type}</>}
+          {doc.notes && <> — {doc.notes}</>}
+        </li>
+      ))}
+    </ul>
   );
 }
 

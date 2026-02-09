@@ -10,15 +10,15 @@
 - [x] Decide on `SESSION_SECRET` — keeping for future CSRF signing
 - [x] Add input length limits on form fields (server-side and/or maxlength)
 - [x] Add expired session cleanup (prune on login)
-- [ ] Show error message on `/access` page when access code is wrong
-- [ ] Preserve `next` and `assetToken` on failed access code attempt
+- [x] Show error message on `/access` page when access code is wrong
+- [x] Preserve `next` and `assetToken` on failed access code attempt
 
 ## Slice 4 — Direct-to-S3 Uploads (Admin)
 
-- [ ] `POST /api/o/[orgSlug]/admin/assets/[assetId]/documents/init-upload`
-- [ ] Client-side S3 PUT upload
-- [ ] `POST /api/o/[orgSlug]/admin/assets/[assetId]/documents/finalize-upload`
-- [ ] Admin UI for uploading documents on asset page
+- [x] `POST /api/o/[orgSlug]/admin/assets/[assetId]/documents/init-upload`
+- [x] Client-side S3 PUT upload
+- [x] `POST /api/o/[orgSlug]/admin/assets/[assetId]/documents/finalize-upload`
+- [x] Admin UI for uploading documents on asset page
 
 ## Slice 5 — Document Management (Admin)
 

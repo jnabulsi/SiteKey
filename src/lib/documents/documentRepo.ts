@@ -17,3 +17,53 @@ export async function listReadyDocumentsForAsset(assetId: string) {
   });
 }
 
+export async function createUploadingDocument(data: {
+  orgId: string;
+  assetId: string;
+  title: string;
+  filename: string;
+  contentType: string;
+  sizeBytes: number;
+  storageKey: string;
+  docType?: string | null;
+  notes?: string | null;
+}) {
+  return prisma.document.create({
+    data: {
+      org_id: data.orgId,
+      asset_id: data.assetId,
+      title: data.title,
+      filename: data.filename,
+      content_type: data.contentType,
+      size_bytes: data.sizeBytes,
+      storage_key: data.storageKey,
+      doc_type: data.docType ?? null,
+      notes: data.notes ?? null,
+      upload_status: "uploading",
+    },
+  });
+}
+
+export async function finalizeDocument(documentId: string, orgId: string) {
+  return prisma.document.updateMany({
+    where: {
+      id: documentId,
+      org_id: orgId,
+      upload_status: "uploading",
+    },
+    data: {
+      upload_status: "ready",
+      uploaded_at: new Date(),
+    },
+  });
+}
+
+export async function findDocumentByIdAndOrg(
+  documentId: string,
+  orgId: string
+) {
+  return prisma.document.findFirst({
+    where: { id: documentId, org_id: orgId },
+  });
+}
+
