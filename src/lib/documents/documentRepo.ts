@@ -67,3 +67,54 @@ export async function findDocumentByIdAndOrg(
   });
 }
 
+export async function updateDocumentMetadata(
+  documentId: string,
+  orgId: string,
+  data: { title?: string; docType?: string; notes?: string }
+) {
+  const updateData: Record<string, unknown> = {};
+  if (data.title !== undefined) updateData.title = data.title;
+  if (data.docType !== undefined) updateData.doc_type = data.docType;
+  if (data.notes !== undefined) updateData.notes = data.notes;
+
+  return prisma.document.updateMany({
+    where: { id: documentId, org_id: orgId, upload_status: "ready" },
+    data: updateData,
+  });
+}
+
+export async function deleteDocument(documentId: string, orgId: string) {
+  const doc = await prisma.document.findFirst({
+    where: { id: documentId, org_id: orgId },
+    select: { id: true, storage_key: true },
+  });
+  if (!doc) return null;
+
+  await prisma.document.delete({ where: { id: doc.id } });
+  return doc.storage_key;
+}
+
+export async function setDocumentReplacing(documentId: string, orgId: string) {
+  return prisma.document.updateMany({
+    where: { id: documentId, org_id: orgId, upload_status: "ready" },
+    data: { upload_status: "replacing" },
+  });
+}
+
+export async function finalizeReplaceDocument(
+  documentId: string,
+  orgId: string,
+  data: { storageKey: string; filename: string; sizeBytes: number }
+) {
+  return prisma.document.updateMany({
+    where: { id: documentId, org_id: orgId, upload_status: "replacing" },
+    data: {
+      storage_key: data.storageKey,
+      filename: data.filename,
+      size_bytes: data.sizeBytes,
+      upload_status: "ready",
+      uploaded_at: new Date(),
+    },
+  });
+}
+

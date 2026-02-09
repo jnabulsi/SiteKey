@@ -3,6 +3,7 @@ import {
   GetObjectCommand,
   PutObjectCommand,
   HeadObjectCommand,
+  DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "@/env";
@@ -44,6 +45,15 @@ export async function presignPutObject(
 
 export async function headObject(storageKey: string) {
   const cmd = new HeadObjectCommand({
+    Bucket: env.AWS_S3_BUCKET,
+    Key: storageKey,
+  });
+
+  return s3.send(cmd);
+}
+
+export async function deleteObject(storageKey: string) {
+  const cmd = new DeleteObjectCommand({
     Bucket: env.AWS_S3_BUCKET,
     Key: storageKey,
   });

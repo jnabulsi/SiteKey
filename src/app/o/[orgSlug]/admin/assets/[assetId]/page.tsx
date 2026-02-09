@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/db/prisma";
 import { findOrgBySlug } from "@/lib/org/orgRepo";
-import { listReadyDocumentsForAsset } from "@/lib/documents/documentRepo";
 import { notFound } from "next/navigation";
 import DocumentUploadForm from "./DocumentUploadForm";
+import DocumentActions from "./DocumentActions";
 
 type Props = {
   params: Promise<{ orgSlug: string; assetId: string }>;
@@ -89,13 +89,30 @@ export default async function EditAssetPage(props: Props) {
       <hr />
 
       <h2>Documents</h2>
-      <DocumentList assetId={assetId} />
+      <DocumentList assetId={assetId} orgSlug={orgSlug} />
     </>
   );
 }
 
-async function DocumentList({ assetId }: { assetId: string }) {
-  const documents = await listReadyDocumentsForAsset(assetId);
+async function DocumentList({
+  assetId,
+  orgSlug,
+}: {
+  assetId: string;
+  orgSlug: string;
+}) {
+  const documents = await prisma.document.findMany({
+    where: { asset_id: assetId, upload_status: "ready" },
+    orderBy: { uploaded_at: "desc" },
+    select: {
+      id: true,
+      title: true,
+      doc_type: true,
+      notes: true,
+      filename: true,
+      size_bytes: true,
+    },
+  });
 
   if (documents.length === 0) {
     return <p>No documents yet.</p>;
@@ -104,13 +121,14 @@ async function DocumentList({ assetId }: { assetId: string }) {
   return (
     <ul>
       {documents.map((doc) => (
-        <li key={doc.id}>
-          <a href={`/d/${doc.id}`} target="_blank" rel="noreferrer">
-            {doc.title}
-          </a>
-          {doc.doc_type && <> — {doc.doc_type}</>}
-          {doc.notes && <> — {doc.notes}</>}
-        </li>
+        <DocumentActions
+          key={doc.id}
+          doc={{
+            ...doc,
+            size_bytes: doc.size_bytes?.toString() ?? null,
+          }}
+          orgSlug={orgSlug}
+        />
       ))}
     </ul>
   );

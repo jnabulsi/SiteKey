@@ -22,10 +22,10 @@
 
 ## Slice 5 — Document Management (Admin)
 
-- [ ] `PATCH /api/o/[orgSlug]/admin/documents/[documentId]` — update metadata
-- [ ] `POST .../documents/[documentId]/init-replace` + `finalize-replace` — replace file
-- [ ] `DELETE /api/o/[orgSlug]/admin/documents/[documentId]` — delete doc + S3 object
-- [ ] Admin UI for viewing, editing, replacing, and deleting documents
+- [x] `PATCH /api/o/[orgSlug]/admin/documents/[documentId]` — update metadata
+- [x] `POST .../documents/[documentId]/init-replace` + `finalize-replace` — replace file
+- [x] `DELETE /api/o/[orgSlug]/admin/documents/[documentId]` — delete doc + S3 object
+- [x] Admin UI for viewing, editing, replacing, and deleting documents
 
 ## Other Remaining Work
 
