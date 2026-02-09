@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import crypto from "crypto";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/constants";
 import { createAdminSession } from "@/lib/auth/sessionRepo";
 import { findOrgBySlug } from "@/lib/org/orgRepo";
+import { verifyPassword } from "@/lib/auth/passwords";
 
 export async function POST(
   req: Request,
@@ -22,12 +22,8 @@ export async function POST(
 
   }
 
-  const inputHash = crypto
-    .createHash("sha256")
-    .update(password, "utf8")
-    .digest("hex");
-
-  if (inputHash !== org.admin_password_hash) {
+  const valid = await verifyPassword(password, org.admin_password_hash);
+  if (!valid) {
     const url = new URL(`/o/${encodeURIComponent(orgSlug)}/login`, req.url);
     url.searchParams.set("error", "invalid");
     return NextResponse.redirect(url, { status: 303 });

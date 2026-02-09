@@ -4,7 +4,7 @@ import { findAssetByPublicToken } from "@/lib/assets/assetRepo";
 import { createFieldSession } from "@/lib/auth/sessionRepo";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/constants";
 import { prisma } from "@/lib/db/prisma";
-import crypto from "crypto";
+import { verifyPassword } from "@/lib/auth/passwords";
 
 export async function POST(req: Request) {
   const formData = await req.formData();
@@ -27,12 +27,8 @@ export async function POST(req: Request) {
   }
 
   // Validate access code
-  const inputHash = crypto
-    .createHash("sha256")
-    .update(accessCode, "utf8")
-    .digest("hex");
-
-  if (inputHash !== org.access_code_hash) {
+  const valid = await verifyPassword(accessCode, org.access_code_hash);
+  if (!valid) {
     return NextResponse.redirect(new URL("/access", req.url), { status: 303 });
   }
 

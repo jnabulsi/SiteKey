@@ -1,11 +1,22 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/constants";
+import { hashSessionToken } from "@/lib/auth/tokens";
+import { prisma } from "@/lib/db/prisma";
 
 export async function POST(req: Request) {
   const cookieStore = await cookies();
 
-  // Clear cookie (match path)
+  // Invalidate session in DB
+  const rawToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  if (rawToken) {
+    const tokenHash = hashSessionToken(rawToken);
+    await prisma.session.deleteMany({
+      where: { session_token_hash: tokenHash },
+    });
+  }
+
+  // Clear cookie
   cookieStore.set({
     name: SESSION_COOKIE_NAME,
     value: "",
