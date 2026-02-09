@@ -15,12 +15,12 @@ export default async function NewAssetPage(props: Props) {
         <p style={{ color: "red" }}>Name is required</p>
       )}
 
-      <form method="POST" action={`/api/o/${orgSlug}/admin/assets`}>
+      <form method="POST" action={`/api/o/${encodeURIComponent(orgSlug)}/admin/assets`}>
         <div>
           <label>
             Name
             <br />
-            <input name="name" required />
+            <input name="name" required maxLength={200} />
           </label>
         </div>
 
@@ -28,7 +28,7 @@ export default async function NewAssetPage(props: Props) {
           <label>
             Location
             <br />
-            <input name="location" />
+            <input name="location" maxLength={200} />
           </label>
         </div>
 
@@ -36,7 +36,7 @@ export default async function NewAssetPage(props: Props) {
           <label>
             Notes
             <br />
-            <textarea name="notes" rows={4} />
+            <textarea name="notes" rows={4} maxLength={2000} />
           </label>
         </div>
 

@@ -30,6 +30,13 @@ export async function createSession(args: {
     },
   });
 
+  // Fire-and-forget: prune expired sessions for this org
+  prisma.session
+    .deleteMany({
+      where: { org_id: args.orgId, expires_at: { lt: now } },
+    })
+    .catch(() => {});
+
   return { rawToken, expiresAt };
 }
 

@@ -20,17 +20,15 @@ export async function POST(
 
   const formData = await req.formData();
 
-  const name = String(formData.get("name") ?? "").trim();
-  const location = String(formData.get("location") ?? "").trim();
-  const notes = String(formData.get("notes") ?? "").trim();
+  const name = String(formData.get("name") ?? "").trim().slice(0, 200);
+  const location = String(formData.get("location") ?? "").trim().slice(0, 200);
+  const notes = String(formData.get("notes") ?? "").trim().slice(0, 2000);
   const isPublic = formData.get("is_public") === "on";
 
   if (!name) {
-    if (!name) {
-      const url = new URL(`/o/${orgSlug}/admin/assets/new`, req.url);
-      url.searchParams.set("error", "name");
-      return NextResponse.redirect(url, { status: 303 });
-    }
+    const url = new URL(`/o/${encodeURIComponent(orgSlug)}/admin/assets/new`, req.url);
+    url.searchParams.set("error", "name");
+    return NextResponse.redirect(url, { status: 303 });
   }
 
   // Retry token generation on the extremely unlikely collision
@@ -56,7 +54,7 @@ export async function POST(
   });
 
   // Redirect back to assets list
-  return NextResponse.redirect(new URL(`/o/${orgSlug}/admin/assets`, req.url), {
+  return NextResponse.redirect(new URL(`/o/${encodeURIComponent(orgSlug)}/admin/assets`, req.url), {
     status: 303,
   });
 }

@@ -22,7 +22,7 @@ export default async function AdminAssetsPage(props: Props) {
       <h1>Assets</h1>
 
       <p>
-        <a href={`/o/${orgSlug}/admin/assets/new`}>Create new asset</a>
+        <a href={`/o/${encodeURIComponent(orgSlug)}/admin/assets/new`}>Create new asset</a>
       </p>
 
       {assets.length === 0 ? (
@@ -33,7 +33,7 @@ export default async function AdminAssetsPage(props: Props) {
             <li key={a.id}>
               <strong>{a.name}</strong>{" "}
               {a.is_public ? "(public)" : "(private)"} —{" "}
-              <a href={`/o/${orgSlug}/admin/assets/${a.id}`}>Edit</a>{" "}
+              <a href={`/o/${encodeURIComponent(orgSlug)}/admin/assets/${a.id}`}>Edit</a>{" "}
               —{" "}
               <a href={`/a/${a.public_token}`} target="_blank" rel="noreferrer">
                 Open

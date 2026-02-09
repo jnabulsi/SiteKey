@@ -35,7 +35,7 @@ export default async function AdminLoginPage(props: Props) {
         <p style={{ color: "red" }}>Invalid password</p>
       )}
 
-      <form method="POST" action={`/api/o/${orgSlug}/login`}>
+      <form method="POST" action={`/api/o/${encodeURIComponent(orgSlug)}/login`}>
         <div>
           <label>
             Password

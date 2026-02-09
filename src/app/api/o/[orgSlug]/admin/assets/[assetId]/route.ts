@@ -26,20 +26,20 @@ export async function POST(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    return NextResponse.redirect(new URL(`/o/${orgSlug}/admin/assets`, req.url), {
+    return NextResponse.redirect(new URL(`/o/${encodeURIComponent(orgSlug)}/admin/assets`, req.url), {
       status: 303,
     });
   }
 
   // default: update
-  const name = String(formData.get("name") ?? "").trim();
-  const location = String(formData.get("location") ?? "").trim();
-  const notes = String(formData.get("notes") ?? "").trim();
+  const name = String(formData.get("name") ?? "").trim().slice(0, 200);
+  const location = String(formData.get("location") ?? "").trim().slice(0, 200);
+  const notes = String(formData.get("notes") ?? "").trim().slice(0, 2000);
   const isPublic = formData.get("is_public") === "on";
 
   if (!name) {
     const url = new URL(
-      `/o/${orgSlug}/admin/assets/${assetId}`,
+      `/o/${encodeURIComponent(orgSlug)}/admin/assets/${encodeURIComponent(assetId)}`,
       req.url
     );
     url.searchParams.set("error", "name");
@@ -61,7 +61,7 @@ export async function POST(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  return NextResponse.redirect(new URL(`/o/${orgSlug}/admin/assets`, req.url), {
+  return NextResponse.redirect(new URL(`/o/${encodeURIComponent(orgSlug)}/admin/assets`, req.url), {
     status: 303,
   });
 }

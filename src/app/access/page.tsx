@@ -2,15 +2,20 @@ type Props = {
   searchParams: Promise<{
     next?: string;
     assetToken?: string;
+    error?: string;
   }>;
 };
 
 export default async function AccessPage(props: Props) {
-  const { next = "/", assetToken = "" } = await props.searchParams;
+  const { next = "/", assetToken = "", error } = await props.searchParams;
 
   return (
     <main style={{ padding: 16 }}>
       <h1>Access</h1>
+
+      {error === "invalid" && (
+        <p style={{ color: "red" }}>Invalid access code</p>
+      )}
 
       <form method="POST" action="/api/access">
         <input type="hidden" name="next" value={next} />

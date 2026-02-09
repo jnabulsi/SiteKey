@@ -3,13 +3,15 @@
 ## Review Fixes
 
 - [x] Replace SHA-256 with scrypt for password and access code hashing (login + access routes, hash script)
-- [ ] Invalidate session row in DB on logout (not just clear cookie)
-- [ ] Encode `orgSlug` in form action URLs consistently (`encodeURIComponent`)
-- [ ] Remove duplicate `if (!name)` check in `src/app/api/o/[orgSlug]/admin/assets/route.ts`
-- [ ] Remove redundant `requireAdminSession` call in `src/app/o/[orgSlug]/admin/page.tsx` (layout already handles it)
-- [ ] Decide on `SESSION_SECRET` — use it (CSRF?) or remove from env schema
-- [ ] Add input length limits on form fields (server-side and/or maxlength)
-- [ ] Add expired session cleanup (cron or pruning on write)
+- [x] Invalidate session row in DB on logout (not just clear cookie)
+- [x] Encode `orgSlug` in form action URLs consistently (`encodeURIComponent`)
+- [x] Remove duplicate `if (!name)` check in `src/app/api/o/[orgSlug]/admin/assets/route.ts`
+- [x] Remove redundant `requireAdminSession` call in `src/app/o/[orgSlug]/admin/page.tsx` (layout already handles it)
+- [x] Decide on `SESSION_SECRET` — keeping for future CSRF signing
+- [x] Add input length limits on form fields (server-side and/or maxlength)
+- [x] Add expired session cleanup (prune on login)
+- [ ] Show error message on `/access` page when access code is wrong
+- [ ] Preserve `next` and `assetToken` on failed access code attempt
 
 ## Slice 4 — Direct-to-S3 Uploads (Admin)
 

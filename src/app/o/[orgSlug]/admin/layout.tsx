@@ -22,9 +22,9 @@ export default async function AdminLayout(props: Props) {
       <header style={{ marginBottom: 16 }}>
         <strong>SiteKey Admin</strong> — {org.name} ({orgSlug})
         <nav style={{ marginTop: 8, display: "flex", gap: 12 }}>
-          <a href={`/o/${orgSlug}/admin`}>Home</a>
-          <a href={`/o/${orgSlug}/admin/assets`}>Assets</a>
-          <a href={`/o/${orgSlug}/admin/settings`}>Settings</a>
+          <a href={`/o/${encodeURIComponent(orgSlug)}/admin`}>Home</a>
+          <a href={`/o/${encodeURIComponent(orgSlug)}/admin/assets`}>Assets</a>
+          <a href={`/o/${encodeURIComponent(orgSlug)}/admin/settings`}>Settings</a>
 
           <form
             method="POST"

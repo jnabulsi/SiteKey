@@ -13,24 +13,26 @@ export async function POST(req: Request) {
   const assetToken = String(formData.get("assetToken") ?? "");
   const next = String(formData.get("next") ?? "/");
 
+  function failRedirect(error: string) {
+    const url = new URL("/access", req.url);
+    url.searchParams.set("error", error);
+    if (assetToken) url.searchParams.set("assetToken", assetToken);
+    if (next && next !== "/") url.searchParams.set("next", next);
+    return NextResponse.redirect(url, { status: 303 });
+  }
+
   // Resolve asset → org
   const asset = await findAssetByPublicToken(assetToken);
-  if (!asset) {
-    return NextResponse.redirect(new URL("/access", req.url), { status: 303 });
-  }
+  if (!asset) return failRedirect("invalid");
 
   const org = await prisma.organisation.findUnique({
     where: { id: asset.org_id },
   });
-  if (!org) {
-    return NextResponse.redirect(new URL("/access", req.url), { status: 303 });
-  }
+  if (!org) return failRedirect("invalid");
 
   // Validate access code
   const valid = await verifyPassword(accessCode, org.access_code_hash);
-  if (!valid) {
-    return NextResponse.redirect(new URL("/access", req.url), { status: 303 });
-  }
+  if (!valid) return failRedirect("invalid");
 
   // Create session
   const { rawToken, expiresAt } = await createFieldSession(org.id);

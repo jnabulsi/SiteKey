@@ -33,13 +33,13 @@ export default async function EditAssetPage(props: Props) {
           Open public link
         </a>
       </p>
-      <form method="POST" action={`/api/o/${orgSlug}/admin/assets/${assetId}`}>
+      <form method="POST" action={`/api/o/${encodeURIComponent(orgSlug)}/admin/assets/${encodeURIComponent(assetId)}`}>
         <input type="hidden" name="action" value="update" />
         <div>
           <label>
             Name
             <br />
-            <input name="name" defaultValue={asset.name} required />
+            <input name="name" defaultValue={asset.name} required maxLength={200} />
           </label>
         </div>
 
@@ -47,7 +47,7 @@ export default async function EditAssetPage(props: Props) {
           <label>
             Location
             <br />
-            <input name="location" defaultValue={asset.location ?? ""} />
+            <input name="location" defaultValue={asset.location ?? ""} maxLength={200} />
           </label>
         </div>
 
@@ -55,7 +55,7 @@ export default async function EditAssetPage(props: Props) {
           <label>
             Notes
             <br />
-            <textarea name="notes" rows={4} defaultValue={asset.notes ?? ""} />
+            <textarea name="notes" rows={4} defaultValue={asset.notes ?? ""} maxLength={2000} />
           </label>
         </div>
 
@@ -75,7 +75,7 @@ export default async function EditAssetPage(props: Props) {
 
       <hr />
 
-      <form method="POST" action={`/api/o/${orgSlug}/admin/assets/${assetId}`}>
+      <form method="POST" action={`/api/o/${encodeURIComponent(orgSlug)}/admin/assets/${encodeURIComponent(assetId)}`}>
         <input type="hidden" name="action" value="delete" />
         <button type="submit">Delete asset</button>
       </form>
