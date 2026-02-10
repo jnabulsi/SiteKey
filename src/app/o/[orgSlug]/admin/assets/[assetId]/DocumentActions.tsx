@@ -17,9 +17,10 @@ type Props = {
 };
 
 type Phase = "idle" | "init" | "uploading" | "finalizing" | "done" | "error";
+type Mode = "view" | "edit" | "replace";
 
 export default function DocumentActions({ doc, orgSlug }: Props) {
-  const [editing, setEditing] = useState(false);
+  const [mode, setMode] = useState<Mode>("view");
   const [title, setTitle] = useState(doc.title);
   const [docType, setDocType] = useState(doc.doc_type ?? "");
   const [notes, setNotes] = useState(doc.notes ?? "");
@@ -32,6 +33,13 @@ export default function DocumentActions({ doc, orgSlug }: Props) {
   const apiBase = `/api/o/${encodeURIComponent(orgSlug)}/admin/documents/${encodeURIComponent(doc.id)}`;
 
   if (deleted) return null;
+
+  function switchMode(next: Mode) {
+    setError(null);
+    setReplacePhase("idle");
+    if (fileRef.current) fileRef.current.value = "";
+    setMode(next);
+  }
 
   async function handleSaveMetadata(e: React.FormEvent) {
     e.preventDefault();
@@ -52,7 +60,7 @@ export default function DocumentActions({ doc, orgSlug }: Props) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error || `Failed (${res.status})`);
       }
-      setEditing(false);
+      switchMode("view");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed");
     } finally {
@@ -169,9 +177,19 @@ export default function DocumentActions({ doc, orgSlug }: Props) {
     replacePhase !== "done" &&
     replacePhase !== "error";
 
+  const sizeLabel = doc.size_bytes
+    ? `${(Number(doc.size_bytes) / 1024).toFixed(0)} KB`
+    : null;
+
   return (
-    <div className={`rounded-md border px-4 py-3 ${editing ? "border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-950/30" : "border-gray-200 dark:border-gray-700"}`}>
-      {editing ? (
+    <div
+      className={`rounded-md border px-4 py-3 ${
+        mode !== "view"
+          ? "border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-950/30"
+          : "border-gray-200 dark:border-gray-700"
+      }`}
+    >
+      {mode === "edit" ? (
         <form onSubmit={handleSaveMetadata} className="space-y-3">
           <div>
             <label className="block text-sm font-medium mb-1">Title</label>
@@ -215,14 +233,50 @@ export default function DocumentActions({ doc, orgSlug }: Props) {
             </button>
             <button
               type="button"
-              onClick={() => setEditing(false)}
+              onClick={() => switchMode("view")}
               disabled={saving}
-              className="rounded-md border border-gray-300 dark:border-gray-600 px-3 py-1 text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+              className="rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
             >
               Cancel
             </button>
           </div>
         </form>
+      ) : mode === "replace" ? (
+        <div className="space-y-3">
+          <p className="text-sm font-medium">Replace file for &ldquo;{title}&rdquo;</p>
+          <div className="flex items-center gap-2">
+            <input
+              ref={fileRef}
+              type="file"
+              accept="application/pdf"
+              disabled={replaceBusy}
+              className="text-sm file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-sm file:font-medium hover:file:bg-gray-200 dark:file:bg-gray-700 dark:hover:file:bg-gray-600 disabled:opacity-50"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleReplace}
+              disabled={replaceBusy}
+              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {replaceBusy ? replacePhaseLabel(replacePhase) : "Upload replacement"}
+            </button>
+            <button
+              type="button"
+              onClick={() => switchMode("view")}
+              disabled={replaceBusy}
+              className="rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
+              Cancel
+            </button>
+            {replacePhase === "done" && (
+              <span className="text-sm text-green-600 dark:text-green-400">
+                Replaced!
+              </span>
+            )}
+          </div>
+        </div>
       ) : (
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
@@ -234,24 +288,29 @@ export default function DocumentActions({ doc, orgSlug }: Props) {
             >
               {title}
             </a>
-            {(docType || notes) && (
-              <p className="text-gray-500 dark:text-gray-400 text-sm mt-0.5 truncate">
-                {docType}{docType && notes ? " — " : ""}{notes}
-              </p>
-            )}
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-0.5 truncate">
+              {[docType, notes, sizeLabel].filter(Boolean).join(" — ")}
+            </p>
           </div>
           <div className="flex gap-2 shrink-0">
             <button
               type="button"
-              onClick={() => setEditing(true)}
+              onClick={() => switchMode("edit")}
               className="rounded-md border border-gray-300 dark:border-gray-600 px-3 py-1 text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
             >
               Edit
             </button>
             <button
               type="button"
+              onClick={() => switchMode("replace")}
+              className="rounded-md border border-gray-300 dark:border-gray-600 px-3 py-1 text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
+              Replace
+            </button>
+            <button
+              type="button"
               onClick={handleDelete}
-              className="rounded-md border border-red-300 dark:border-red-700 px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
+              className="px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:underline"
             >
               Delete
             </button>
@@ -262,29 +321,6 @@ export default function DocumentActions({ doc, orgSlug }: Props) {
       {error && (
         <p className="text-sm text-red-600 dark:text-red-400 mt-2">{error}</p>
       )}
-
-      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-        <input
-          ref={fileRef}
-          type="file"
-          accept="application/pdf"
-          disabled={replaceBusy}
-          className="text-sm file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-sm file:font-medium hover:file:bg-gray-200 dark:file:bg-gray-700 dark:hover:file:bg-gray-600 disabled:opacity-50"
-        />
-        <button
-          type="button"
-          onClick={handleReplace}
-          disabled={replaceBusy}
-          className="rounded-md border border-gray-300 dark:border-gray-600 px-3 py-1 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {replaceBusy ? replacePhaseLabel(replacePhase) : "Replace file"}
-        </button>
-        {replacePhase === "done" && (
-          <span className="text-sm text-green-600 dark:text-green-400">
-            Replaced!
-          </span>
-        )}
-      </div>
     </div>
   );
 }
@@ -298,6 +334,6 @@ function replacePhaseLabel(phase: Phase): string {
     case "finalizing":
       return "Finalizing…";
     default:
-      return "Replace file";
+      return "Upload replacement";
   }
 }

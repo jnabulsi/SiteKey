@@ -30,9 +30,9 @@
 ## Slice 6 — Admin UX & Flow Refinement
 
 - [x] Allow documents to be uploaded during asset creation (single cohesive create flow)
-- [ ] Refactor asset edit page layout (improve section ordering and hierarchy)
-- [ ] Improve document section structure (separate metadata editing from file actions)
-- [ ] Standardise button hierarchy (primary, secondary, destructive)
+- [x] Refactor asset edit page layout (improve section ordering and hierarchy)
+- [x] Improve document section structure (separate metadata editing from file actions)
+- [x] Standardise button hierarchy (primary, secondary, destructive)
 - [ ] Improve error and loading state clarity across admin screens
 
 ## Other Remaining Work
