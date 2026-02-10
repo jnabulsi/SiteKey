@@ -18,14 +18,31 @@ export async function POST(
   // Server-side auth guard (redirects if not authed)
   await requireAdminSession(org.id, orgSlug);
 
-  const formData = await req.formData();
+  const isJson = req.headers.get("content-type")?.includes("application/json");
 
-  const name = String(formData.get("name") ?? "").trim().slice(0, 200);
-  const location = String(formData.get("location") ?? "").trim().slice(0, 200);
-  const notes = String(formData.get("notes") ?? "").trim().slice(0, 2000);
-  const isPublic = formData.get("is_public") === "on";
+  let name: string;
+  let location: string;
+  let notes: string;
+  let isPublic: boolean;
+
+  if (isJson) {
+    const body = await req.json();
+    name = String(body.name ?? "").trim().slice(0, 200);
+    location = String(body.location ?? "").trim().slice(0, 200);
+    notes = String(body.notes ?? "").trim().slice(0, 2000);
+    isPublic = body.is_public === true;
+  } else {
+    const formData = await req.formData();
+    name = String(formData.get("name") ?? "").trim().slice(0, 200);
+    location = String(formData.get("location") ?? "").trim().slice(0, 200);
+    notes = String(formData.get("notes") ?? "").trim().slice(0, 2000);
+    isPublic = formData.get("is_public") === "on";
+  }
 
   if (!name) {
+    if (isJson) {
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
+    }
     const url = new URL(`/o/${encodeURIComponent(orgSlug)}/admin/assets/new`, req.url);
     url.searchParams.set("error", "name");
     return NextResponse.redirect(url, { status: 303 });
@@ -42,7 +59,7 @@ export async function POST(
     publicToken = generatePublicToken();
   }
 
-  await prisma.asset.create({
+  const asset = await prisma.asset.create({
     data: {
       org_id: org.id,
       public_token: publicToken,
@@ -52,6 +69,10 @@ export async function POST(
       is_public: isPublic,
     },
   });
+
+  if (isJson) {
+    return NextResponse.json({ id: asset.id, name: asset.name, public_token: asset.public_token });
+  }
 
   // Redirect back to assets list
   return NextResponse.redirect(new URL(`/o/${encodeURIComponent(orgSlug)}/admin/assets`, req.url), {

@@ -106,75 +106,86 @@ export default function DocumentUploadForm({ orgSlug, assetId }: Props) {
 
   return (
     <div>
-      <h2>Upload Document</h2>
+      <h2 className="text-lg font-medium mb-4">Upload Document</h2>
 
       {phase === "done" && (
-        <p style={{ color: "green" }}>
+        <p className="text-sm text-green-600 dark:text-green-400 mb-4">
           Upload complete.{" "}
-          <button type="button" onClick={() => window.location.reload()}>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="underline hover:no-underline"
+          >
             Reload to see document
           </button>
         </p>
       )}
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && (
+        <p className="text-sm text-red-600 dark:text-red-400 mb-4">{error}</p>
+      )}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="max-w-lg space-y-4">
         <div>
-          <label>
-            PDF file
-            <br />
-            <input
-              ref={fileRef}
-              type="file"
-              accept="application/pdf"
-              disabled={busy}
-              required
-            />
-          </label>
+          <label className="block text-sm font-medium mb-1">PDF file</label>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/pdf"
+            disabled={busy}
+            required
+            className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm file:font-medium hover:file:bg-gray-200 dark:file:bg-gray-700 dark:hover:file:bg-gray-600 disabled:opacity-50"
+          />
         </div>
 
         <div>
-          <label>
+          <label className="block text-sm font-medium mb-1" htmlFor="upload-title">
             Title (optional, defaults to filename)
-            <br />
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              maxLength={200}
-              disabled={busy}
-            />
           </label>
+          <input
+            id="upload-title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={200}
+            disabled={busy}
+            className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
         </div>
 
         <div>
-          <label>
+          <label className="block text-sm font-medium mb-1" htmlFor="upload-doctype">
             Document type (optional)
-            <br />
-            <input
-              value={docType}
-              onChange={(e) => setDocType(e.target.value)}
-              maxLength={100}
-              disabled={busy}
-            />
           </label>
+          <input
+            id="upload-doctype"
+            value={docType}
+            onChange={(e) => setDocType(e.target.value)}
+            maxLength={100}
+            disabled={busy}
+            className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
         </div>
 
         <div>
-          <label>
+          <label className="block text-sm font-medium mb-1" htmlFor="upload-notes">
             Notes (optional)
-            <br />
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={3}
-              maxLength={2000}
-              disabled={busy}
-            />
           </label>
+          <textarea
+            id="upload-notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={3}
+            maxLength={2000}
+            disabled={busy}
+            className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
         </div>
 
-        <button type="submit" disabled={busy}>
+        <button
+          type="submit"
+          disabled={busy}
+          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           {busy ? phaseLabel(phase) : "Upload"}
         </button>
       </form>

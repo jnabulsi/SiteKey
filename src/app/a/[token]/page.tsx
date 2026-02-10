@@ -7,6 +7,35 @@ type Props = {
   params: Promise<{ token: string }>;
 };
 
+function DocumentList({
+  documents,
+}: {
+  documents: { id: string; title: string; doc_type: string | null }[];
+}) {
+  if (documents.length === 0) {
+    return <p className="text-gray-500 dark:text-gray-400">No documents.</p>;
+  }
+
+  return (
+    <div className="space-y-2">
+      {documents.map((d) => (
+        <a
+          key={d.id}
+          href={`/d/${d.id}`}
+          className="block rounded-md border border-gray-200 dark:border-gray-700 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        >
+          <span className="font-medium">{d.title}</span>
+          {d.doc_type && (
+            <span className="ml-2 text-gray-500 dark:text-gray-400 text-sm">
+              {d.doc_type}
+            </span>
+          )}
+        </a>
+      ))}
+    </div>
+  );
+}
+
 export default async function AssetPage(props: Props) {
   const { token } = await props.params;
 
@@ -18,23 +47,18 @@ export default async function AssetPage(props: Props) {
     const documents = await listReadyDocumentsForAsset(asset.id);
 
     return (
-      <main style={{ padding: 16 }}>
-        <h1>{asset.name}</h1>
-        <p>Public asset</p>
+      <main className="flex min-h-screen items-start justify-center px-4 py-8">
+        <div className="w-full max-w-lg space-y-6">
+          <div>
+            <h1 className="text-2xl font-semibold">{asset.name}</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Public asset</p>
+          </div>
 
-        <h2 style={{ marginTop: 16 }}>Documents</h2>
-        {documents.length === 0 ? (
-          <p>No documents.</p>
-        ) : (
-          <ul>
-            {documents.map((d) => (
-              <li key={d.id}>
-                <a href={`/d/${d.id}`}>{d.title}</a>
-                {d.doc_type ? ` (${d.doc_type})` : null}
-              </li>
-            ))}
-          </ul>
-        )}
+          <div>
+            <h2 className="text-lg font-medium mb-3">Documents</h2>
+            <DocumentList documents={documents} />
+          </div>
+        </div>
       </main>
     );
   }
@@ -50,24 +74,18 @@ export default async function AssetPage(props: Props) {
   const documents = await listReadyDocumentsForAsset(asset.id);
 
   return (
-    <main style={{ padding: 16 }}>
-      <h1>{asset.name}</h1>
-      <p>Private asset (authorised)</p>
+    <main className="flex min-h-screen items-start justify-center px-4 py-8">
+      <div className="w-full max-w-lg space-y-6">
+        <div>
+          <h1 className="text-2xl font-semibold">{asset.name}</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Private asset</p>
+        </div>
 
-      <h2 style={{ marginTop: 16 }}>Documents</h2>
-      {documents.length === 0 ? (
-        <p>No documents.</p>
-      ) : (
-        <ul>
-          {documents.map((d) => (
-            <li key={d.id}>
-              <a href={`/d/${d.id}`}>{d.title}</a>
-              {d.doc_type ? ` (${d.doc_type})` : null}
-            </li>
-          ))}
-        </ul>
-      )}
+        <div>
+          <h2 className="text-lg font-medium mb-3">Documents</h2>
+          <DocumentList documents={documents} />
+        </div>
+      </div>
     </main>
   );
 }
-

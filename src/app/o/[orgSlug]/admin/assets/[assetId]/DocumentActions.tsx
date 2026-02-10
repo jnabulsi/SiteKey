@@ -170,95 +170,122 @@ export default function DocumentActions({ doc, orgSlug }: Props) {
     replacePhase !== "error";
 
   return (
-    <li>
+    <div className={`rounded-md border px-4 py-3 ${editing ? "border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-950/30" : "border-gray-200 dark:border-gray-700"}`}>
       {editing ? (
-        <form onSubmit={handleSaveMetadata} style={{ marginBottom: "0.5em" }}>
+        <form onSubmit={handleSaveMetadata} className="space-y-3">
           <div>
-            <label>
-              Title
-              <br />
-              <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                maxLength={200}
-                disabled={saving}
-                required
-              />
-            </label>
+            <label className="block text-sm font-medium mb-1">Title</label>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={200}
+              disabled={saving}
+              required
+              className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
           </div>
           <div>
-            <label>
-              Doc type
-              <br />
-              <input
-                value={docType}
-                onChange={(e) => setDocType(e.target.value)}
-                maxLength={100}
-                disabled={saving}
-              />
-            </label>
+            <label className="block text-sm font-medium mb-1">Doc type</label>
+            <input
+              value={docType}
+              onChange={(e) => setDocType(e.target.value)}
+              maxLength={100}
+              disabled={saving}
+              className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
           </div>
           <div>
-            <label>
-              Notes
-              <br />
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={2}
-                maxLength={2000}
-                disabled={saving}
-              />
-            </label>
+            <label className="block text-sm font-medium mb-1">Notes</label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={2}
+              maxLength={2000}
+              disabled={saving}
+              className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
           </div>
-          <button type="submit" disabled={saving}>
-            {saving ? "Saving…" : "Save"}
-          </button>{" "}
-          <button
-            type="button"
-            onClick={() => setEditing(false)}
-            disabled={saving}
-          >
-            Cancel
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={saving}
+              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {saving ? "Saving…" : "Save"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditing(false)}
+              disabled={saving}
+              className="rounded-md border border-gray-300 dark:border-gray-600 px-3 py-1 text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       ) : (
-        <>
-          <a href={`/d/${doc.id}`} target="_blank" rel="noreferrer">
-            {title}
-          </a>
-          {docType && <> — {docType}</>}
-          {notes && <> — {notes}</>}
-          {" "}
-          <button type="button" onClick={() => setEditing(true)}>
-            Edit
-          </button>{" "}
-          <button type="button" onClick={handleDelete}>
-            Delete
-          </button>
-        </>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <a
+              href={`/d/${doc.id}`}
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              {title}
+            </a>
+            {(docType || notes) && (
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-0.5 truncate">
+                {docType}{docType && notes ? " — " : ""}{notes}
+              </p>
+            )}
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="rounded-md border border-gray-300 dark:border-gray-600 px-3 py-1 text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="rounded-md border border-red-300 dark:border-red-700 px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
       )}
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && (
+        <p className="text-sm text-red-600 dark:text-red-400 mt-2">{error}</p>
+      )}
 
-      <div style={{ marginTop: "0.25em" }}>
+      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
         <input
           ref={fileRef}
           type="file"
           accept="application/pdf"
           disabled={replaceBusy}
-          style={{ fontSize: "0.85em" }}
+          className="text-sm file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-sm file:font-medium hover:file:bg-gray-200 dark:file:bg-gray-700 dark:hover:file:bg-gray-600 disabled:opacity-50"
         />
-        <button type="button" onClick={handleReplace} disabled={replaceBusy}>
+        <button
+          type="button"
+          onClick={handleReplace}
+          disabled={replaceBusy}
+          className="rounded-md border border-gray-300 dark:border-gray-600 px-3 py-1 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           {replaceBusy ? replacePhaseLabel(replacePhase) : "Replace file"}
         </button>
         {replacePhase === "done" && (
-          <span style={{ color: "green", marginLeft: "0.5em" }}>
+          <span className="text-sm text-green-600 dark:text-green-400">
             Replaced!
           </span>
         )}
       </div>
-    </li>
+    </div>
   );
 }
 

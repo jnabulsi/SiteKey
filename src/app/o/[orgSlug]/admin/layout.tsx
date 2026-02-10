@@ -17,28 +17,41 @@ export default async function AdminLayout(props: Props) {
 
   await requireAdminSession(org.id, orgSlug);
 
+  const base = `/o/${encodeURIComponent(orgSlug)}/admin`;
+
   return (
-    <main style={{ padding: 16 }}>
-      <header style={{ marginBottom: 16 }}>
-        <strong>SiteKey Admin</strong> — {org.name} ({orgSlug})
-        <nav style={{ marginTop: 8, display: "flex", gap: 12 }}>
-          <a href={`/o/${encodeURIComponent(orgSlug)}/admin`}>Home</a>
-          <a href={`/o/${encodeURIComponent(orgSlug)}/admin/assets`}>Assets</a>
-          <a href={`/o/${encodeURIComponent(orgSlug)}/admin/settings`}>Settings</a>
+    <>
+      <header className="border-b border-gray-200 dark:border-gray-700">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-3">
+            <span className="font-bold">SiteKey</span>
+            <span className="text-gray-500 dark:text-gray-400 text-sm">{org.name}</span>
+          </div>
 
-          <form
-            method="POST"
-            action={`/api/logout?next=/o/${encodeURIComponent(orgSlug)}/login`}
-            style={{ display: "inline" }}
-          >
-            <button type="submit">Logout</button>
-          </form>
-        </nav>
+          <nav className="flex items-center gap-4 text-sm">
+            <a href={base} className="hover:underline">Home</a>
+            <a href={`${base}/assets`} className="hover:underline">Assets</a>
+            <a href={`${base}/settings`} className="hover:underline">Settings</a>
 
+            <form
+              method="POST"
+              action={`/api/logout?next=/o/${encodeURIComponent(orgSlug)}/login`}
+              className="inline"
+            >
+              <button
+                type="submit"
+                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:underline"
+              >
+                Logout
+              </button>
+            </form>
+          </nav>
+        </div>
       </header>
 
-      {children}
-    </main>
+      <main className="mx-auto max-w-5xl px-4 sm:px-6 py-6">
+        {children}
+      </main>
+    </>
   );
 }
-

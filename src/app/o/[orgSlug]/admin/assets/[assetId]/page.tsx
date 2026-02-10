@@ -13,7 +13,6 @@ export default async function EditAssetPage(props: Props) {
   const { orgSlug, assetId } = await props.params;
   const { error } = await props.searchParams;
 
-
   const org = await findOrgBySlug(orgSlug);
   if (!org) notFound();
 
@@ -24,72 +23,115 @@ export default async function EditAssetPage(props: Props) {
 
   return (
     <>
-      <h1>Edit Asset</h1>
-
-      {error === "name" && (
-        <p style={{ color: "red" }}>Name is required</p>
-      )}
-
-      <p>
-        <a href={`/a/${asset.public_token}`} target="_blank" rel="noreferrer">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold">Edit Asset</h1>
+        <a
+          href={`/a/${asset.public_token}`}
+          target="_blank"
+          rel="noreferrer"
+          className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+        >
           Open public link
         </a>
-      </p>
-      <form method="POST" action={`/api/o/${encodeURIComponent(orgSlug)}/admin/assets/${encodeURIComponent(assetId)}`}>
+      </div>
+
+      {error === "name" && (
+        <p className="text-sm text-red-600 dark:text-red-400 mb-4">Name is required</p>
+      )}
+
+      <form
+        method="POST"
+        action={`/api/o/${encodeURIComponent(orgSlug)}/admin/assets/${encodeURIComponent(assetId)}`}
+        className="max-w-lg space-y-4"
+      >
         <input type="hidden" name="action" value="update" />
+
         <div>
-          <label>
+          <label className="block text-sm font-medium mb-1" htmlFor="name">
             Name
-            <br />
-            <input name="name" defaultValue={asset.name} required maxLength={200} />
           </label>
+          <input
+            id="name"
+            name="name"
+            defaultValue={asset.name}
+            required
+            maxLength={200}
+            className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
         </div>
 
         <div>
-          <label>
+          <label className="block text-sm font-medium mb-1" htmlFor="location">
             Location
-            <br />
-            <input name="location" defaultValue={asset.location ?? ""} maxLength={200} />
           </label>
+          <input
+            id="location"
+            name="location"
+            defaultValue={asset.location ?? ""}
+            maxLength={200}
+            className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
         </div>
 
         <div>
-          <label>
+          <label className="block text-sm font-medium mb-1" htmlFor="notes">
             Notes
-            <br />
-            <textarea name="notes" rows={4} defaultValue={asset.notes ?? ""} maxLength={2000} />
           </label>
+          <textarea
+            id="notes"
+            name="notes"
+            rows={4}
+            defaultValue={asset.notes ?? ""}
+            maxLength={2000}
+            className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
         </div>
 
-        <div>
-          <label>
-            <input
-              name="is_public"
-              type="checkbox"
-              defaultChecked={asset.is_public}
-            />{" "}
+        <div className="flex items-center gap-2">
+          <input
+            id="is_public"
+            name="is_public"
+            type="checkbox"
+            defaultChecked={asset.is_public}
+            className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+          />
+          <label className="text-sm font-medium" htmlFor="is_public">
             Public
           </label>
         </div>
 
-        <button type="submit">Save</button>
+        <button
+          type="submit"
+          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600"
+        >
+          Save
+        </button>
       </form>
 
-      <hr />
+      <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-10">
+        <h2 className="text-lg font-medium text-red-600 dark:text-red-400 mb-3">Danger Zone</h2>
+        <form
+          method="POST"
+          action={`/api/o/${encodeURIComponent(orgSlug)}/admin/assets/${encodeURIComponent(assetId)}`}
+        >
+          <input type="hidden" name="action" value="delete" />
+          <button
+            type="submit"
+            className="rounded-md border border-red-300 dark:border-red-700 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
+          >
+            Delete asset
+          </button>
+        </form>
+      </div>
 
-      <form method="POST" action={`/api/o/${encodeURIComponent(orgSlug)}/admin/assets/${encodeURIComponent(assetId)}`}>
-        <input type="hidden" name="action" value="delete" />
-        <button type="submit">Delete asset</button>
-      </form>
+      <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-10">
+        <DocumentUploadForm orgSlug={orgSlug} assetId={assetId} />
+      </div>
 
-      <hr />
-
-      <DocumentUploadForm orgSlug={orgSlug} assetId={assetId} />
-
-      <hr />
-
-      <h2>Documents</h2>
-      <DocumentList assetId={assetId} orgSlug={orgSlug} />
+      <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-10">
+        <h2 className="text-lg font-medium mb-4">Documents</h2>
+        <DocumentList assetId={assetId} orgSlug={orgSlug} />
+      </div>
     </>
   );
 }
@@ -115,11 +157,11 @@ async function DocumentList({
   });
 
   if (documents.length === 0) {
-    return <p>No documents yet.</p>;
+    return <p className="text-gray-500 dark:text-gray-400">No documents yet.</p>;
   }
 
   return (
-    <ul>
+    <div className="space-y-3">
       {documents.map((doc) => (
         <DocumentActions
           key={doc.id}
@@ -130,7 +172,6 @@ async function DocumentList({
           orgSlug={orgSlug}
         />
       ))}
-    </ul>
+    </div>
   );
 }
-

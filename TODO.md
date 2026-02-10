@@ -27,11 +27,20 @@
 - [x] `DELETE /api/o/[orgSlug]/admin/documents/[documentId]` — delete doc + S3 object
 - [x] Admin UI for viewing, editing, replacing, and deleting documents
 
+## Slice 6 — Admin UX & Flow Refinement
+
+- [x] Allow documents to be uploaded during asset creation (single cohesive create flow)
+- [ ] Refactor asset edit page layout (improve section ordering and hierarchy)
+- [ ] Improve document section structure (separate metadata editing from file actions)
+- [ ] Standardise button hierarchy (primary, secondary, destructive)
+- [ ] Improve error and loading state clarity across admin screens
+
 ## Other Remaining Work
 
 - [ ] QR code generation endpoint (`GET /api/o/[orgSlug]/admin/assets/[assetId]/qr`)
-- [ ] Rate limiting on `/api/access` and `/api/o/[orgSlug]/admin/login`
+- [ ] Rate limiting on `/api/access`
+- [ ] Rate limiting on `/api/o/[orgSlug]/admin/login`
 - [ ] CSRF protection
-- [ ] Replace root `/` page with something useful (still default create-next-app)
-- [ ] Decide whether `last_seen_at` on Session is needed — update on auth or drop the column
+- [ ] Replace root `/` page with meaningful content
+- [ ] Decide whether `last_seen_at` on Session is needed (update on auth or remove column)
 - [ ] Asset list pagination (when needed)
