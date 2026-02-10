@@ -109,6 +109,32 @@ export default async function EditAssetPage(props: Props) {
       </form>
 
       <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-10">
+        <h2 className="text-lg font-medium mb-4">QR Code</h2>
+        <div className="flex items-start gap-6">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`/api/o/${encodeURIComponent(orgSlug)}/admin/assets/${encodeURIComponent(assetId)}/qr`}
+            alt="QR code for this asset"
+            width={200}
+            height={200}
+            className="rounded border border-gray-200 dark:border-gray-700"
+          />
+          <div className="space-y-2">
+            <a
+              href={`/api/o/${encodeURIComponent(orgSlug)}/admin/assets/${encodeURIComponent(assetId)}/qr`}
+              download
+              className="inline-block rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600"
+            >
+              Download QR code
+            </a>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Encodes: <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">/a/{asset.public_token}</code>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-10">
         <h2 className="text-lg font-medium mb-4">Documents</h2>
         <DocumentList assetId={assetId} orgSlug={orgSlug} />
 

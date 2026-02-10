@@ -8,6 +8,8 @@ const envSchema = z.object({
   AWS_ACCESS_KEY_ID: z.string().min(1),
   AWS_SECRET_ACCESS_KEY: z.string().min(1),
 
+  PUBLIC_BASE_URL: z.string().url(),
+
   // S3 bucket naming rules are stricter in reality; this is a good MVP guardrail.
   AWS_S3_BUCKET: z
     .string()

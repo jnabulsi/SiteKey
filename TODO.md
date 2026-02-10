@@ -33,11 +33,15 @@
 - [x] Refactor asset edit page layout (improve section ordering and hierarchy)
 - [x] Improve document section structure (separate metadata editing from file actions)
 - [x] Standardise button hierarchy (primary, secondary, destructive)
-- [ ] Improve error and loading state clarity across admin screens
+
+## Slice 7 — QR Code Generation
+
+- [x] Add `PUBLIC_BASE_URL` env var
+- [x] QR code generation endpoint (`GET /api/o/[orgSlug]/admin/assets/[assetId]/qr`)
+- [x] QR download link on asset list page
+- [x] QR preview and download on asset edit page
 
 ## Other Remaining Work
-
-- [ ] QR code generation endpoint (`GET /api/o/[orgSlug]/admin/assets/[assetId]/qr`)
 - [ ] Rate limiting on `/api/access`
 - [ ] Rate limiting on `/api/o/[orgSlug]/admin/login`
 - [ ] CSRF protection

@@ -64,6 +64,13 @@ export default async function AdminAssetsPage(props: Props) {
                       Edit
                     </a>
                     <a
+                      href={`/api/o/${encodeURIComponent(orgSlug)}/admin/assets/${a.id}/qr`}
+                      download
+                      className="text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      QR
+                    </a>
+                    <a
                       href={`/a/${a.public_token}`}
                       target="_blank"
                       rel="noreferrer"
