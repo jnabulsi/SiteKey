@@ -24,7 +24,7 @@ export default async function AdminLoginPage(props: Props) {
     session.org_id === org.id &&
     session.expires_at > new Date()
   ) {
-    redirect(`/o/${encodeURIComponent(orgSlug)}/admin`);
+    redirect(`/o/${encodeURIComponent(orgSlug)}/admin/assets`);
   }
 
   return (

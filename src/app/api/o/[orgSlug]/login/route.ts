@@ -42,6 +42,6 @@ export async function POST(
     expires: expiresAt,
   });
 
-  return NextResponse.redirect(new URL(`/o/${encodeURIComponent(orgSlug)}/admin`, req.url), { status: 303 });
+  return NextResponse.redirect(new URL(`/o/${encodeURIComponent(orgSlug)}/admin/assets`, req.url), { status: 303 });
 }
 

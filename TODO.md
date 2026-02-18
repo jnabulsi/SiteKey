@@ -85,11 +85,11 @@ Abuse protection:
 
 Goal: Consolidate admin UX into something intentional.
 
-- [ ] Remove unused "Home" dashboard
-- [ ] Merge dashboard + assets into single org page
-- [ ] Remove empty Settings page (or stub intentionally)
-- [ ] Simplify top nav (Assets only + Logout)
-- [ ] Ensure clean redirect after login → assets page
+- [x] Remove unused "Home" dashboard
+- [x] Merge dashboard + assets into single org page
+- [x] Remove empty Settings page (or stub intentionally)
+- [x] Simplify top nav (Assets only + Logout)
+- [x] Ensure clean redirect after login → assets page
 
 ---
 
@@ -133,6 +133,7 @@ Scalability:
 
 - [ ] Convert "Open public link" to proper styled button
 - [ ] Show document notes on Asset page 
+- [ ] back to assets button of some sort
 
 ---
 

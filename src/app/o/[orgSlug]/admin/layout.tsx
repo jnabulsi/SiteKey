@@ -17,8 +17,6 @@ export default async function AdminLayout(props: Props) {
 
   await requireAdminSession(org.id, orgSlug);
 
-  const base = `/o/${encodeURIComponent(orgSlug)}/admin`;
-
   return (
     <>
       <header className="border-b border-gray-200 dark:border-gray-700">
@@ -29,10 +27,6 @@ export default async function AdminLayout(props: Props) {
           </div>
 
           <nav className="flex items-center gap-4 text-sm">
-            <a href={base} className="hover:underline">Home</a>
-            <a href={`${base}/assets`} className="hover:underline">Assets</a>
-            <a href={`${base}/settings`} className="hover:underline">Settings</a>
-
             <form
               method="POST"
               action={`/api/logout?next=/o/${encodeURIComponent(orgSlug)}/login`}
