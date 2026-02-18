@@ -111,16 +111,11 @@ Search + filtering:
 - [ ] Add sort options:
   - [ ] Alphabetical
   - [ ] Created date
-  - [ ] Updated date
-- [ ] Optional: tag system for assets
-- [ ] Optional: filter by tag
 
 Column controls:
 
 - [ ] Add created_at column
-- [ ] Add updated_at column
 - [ ] Add document count column
-- [ ] Optional: column visibility toggles
 
 Scalability:
 
