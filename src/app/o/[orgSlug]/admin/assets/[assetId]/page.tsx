@@ -23,16 +23,25 @@ export default async function EditAssetPage(props: Props) {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Edit Asset</h1>
+      <div className="mb-6">
         <a
-          href={`/a/${asset.public_token}`}
-          target="_blank"
-          rel="noreferrer"
-          className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+          href={`/o/${encodeURIComponent(orgSlug)}/admin/assets`}
+          className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
         >
-          Open public link
+          &larr; Back to assets
         </a>
+        <div className="flex items-center justify-between mt-2">
+          <h1 className="text-2xl font-semibold">Edit Asset</h1>
+          <a
+            href={`/a/${asset.public_token}`}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Open public link
+            <span aria-hidden="true">{"\u2197"}</span>
+          </a>
+        </div>
       </div>
 
       {error === "name" && (

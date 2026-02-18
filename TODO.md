@@ -99,37 +99,43 @@ Goal: Make asset list powerful and scalable.
 
 Row behaviour:
 
-- [ ] Entire row clickable to open asset
-- [ ] Remove separate "Open" button
-- [ ] Improve visual weight of Edit + QR buttons
-- [ ] Clear hover state on row
+- [x] Name link navigates to asset edit page (replaces separate Edit button)
+- [x] Clear hover state on row
+- [x] Keep QR + Open actions in actions column
 
 Search + filtering:
 
-- [ ] Add search by asset name
-- [ ] Add visibility filter (Public / Private)
-- [ ] Add sort options:
-  - [ ] Alphabetical
-  - [ ] Created date
+- [x] Add search by asset name
+- [x] Add visibility filter (Public / Private)
+- [x] Add sort options:
+  - [x] Alphabetical (A–Z / Z–A)
+  - [x] Created date (Newest / Oldest)
 
 Column controls:
 
-- [ ] Add created_at column
-- [ ] Add document count column
+- [x] Add created_at column
+- [x] Add document count column
+
+Table styling:
+
+- [x] Rounded border container with header background
+- [x] Consistent cell padding
+- [x] Empty states for no assets / no search results
 
 Scalability:
 
 - [ ] Pagination (if asset count grows)
-- [ ] Consider server-side sorting
 
 ---
 
-## Slice 11 — Edit Asset Page Polish
+## Slice 11 — Edit Asset Page + asset page Polish
 
-- [ ] Convert "Open public link" to proper styled button
-- [ ] Show document notes on Asset page 
-- [ ] back to assets button of some sort
+edit asset page
+- [x] Convert "Open public link" to proper styled button on edit asset page
+- [x] Back to assets link from asset edit page
 
+asset page
+- [x] Show document notes on Asset page
 ---
 
 ## Slice 12 — Cost & Safety Hardening
