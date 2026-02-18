@@ -3,6 +3,7 @@ import { findOrgBySlug } from "@/lib/org/orgRepo";
 import { prisma } from "@/lib/db/prisma";
 import { requireAdminSession } from "@/lib/auth/requireAdminSession";
 import { generatePublicToken } from "@/lib/assets/tokens";
+import { countAssetsForOrg } from "@/lib/assets/assetRepo";
 
 export async function POST(
   req: Request,
@@ -37,6 +38,20 @@ export async function POST(
     location = String(formData.get("location") ?? "").trim().slice(0, 200);
     notes = String(formData.get("notes") ?? "").trim().slice(0, 2000);
     isPublic = formData.get("is_public") === "on";
+  }
+
+  // Enforce asset limit
+  const assetCount = await countAssetsForOrg(org.id);
+  if (assetCount >= org.max_assets) {
+    if (isJson) {
+      return NextResponse.json(
+        { error: `Asset limit reached (${org.max_assets} max)` },
+        { status: 403 }
+      );
+    }
+    const url = new URL(`/o/${encodeURIComponent(orgSlug)}/admin/assets/new`, req.url);
+    url.searchParams.set("error", "limit");
+    return NextResponse.redirect(url, { status: 303 });
   }
 
   if (!name) {

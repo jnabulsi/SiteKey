@@ -12,3 +12,7 @@ export async function findAssetByPublicToken(token: string) {
     where: { public_token: token },
   });
 }
+
+export async function countAssetsForOrg(orgId: string): Promise<number> {
+  return prisma.asset.count({ where: { org_id: orgId } });
+}

@@ -12,9 +12,12 @@ model Organisation {
   name                String
   slug                String     @unique
   access_code_hash    String
-  admin_password_hash String
-  created_at          DateTime   @default(now()) @db.Timestamptz(6)
-  updated_at          DateTime   @updatedAt @db.Timestamptz(6)
+  admin_password_hash     String
+  max_assets              Int      @default(10)
+  max_documents_per_asset Int      @default(10)
+  max_total_documents     Int      @default(50)
+  created_at              DateTime @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime @updatedAt @db.Timestamptz(6)
   assets              Asset[]
   documents           Document[]
   sessions            Session[]
@@ -76,4 +79,12 @@ model Session {
   last_seen_at       DateTime @default(now()) @db.Timestamptz(6)
 
   @@index([org_id])
+}
+
+model RateLimitAttempt {
+  id         String   @id @default(uuid()) @db.Uuid
+  key        String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([key, created_at])
 }

@@ -1,5 +1,13 @@
 import { prisma } from "@/lib/db/prisma";
 
+export async function countDocumentsForAsset(assetId: string): Promise<number> {
+  return prisma.document.count({ where: { asset_id: assetId } });
+}
+
+export async function countDocumentsForOrg(orgId: string): Promise<number> {
+  return prisma.document.count({ where: { org_id: orgId } });
+}
+
 export async function listReadyDocumentsForAsset(assetId: string) {
   return prisma.document.findMany({
     where: {

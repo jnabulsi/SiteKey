@@ -3,7 +3,7 @@ import { z } from "zod";
 import { findOrgBySlug } from "@/lib/org/orgRepo";
 import { requireAdminSessionApi } from "@/lib/auth/requireAdminSessionApi";
 import { prisma } from "@/lib/db/prisma";
-import { createUploadingDocument } from "@/lib/documents/documentRepo";
+import { createUploadingDocument, countDocumentsForAsset, countDocumentsForOrg } from "@/lib/documents/documentRepo";
 import { presignPutObject } from "@/lib/s3/server";
 
 const MAX_SIZE_BYTES = 100 * 1024 * 1024; // 100 MB
@@ -47,6 +47,24 @@ export async function POST(
   });
   if (!asset) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  // Enforce per-asset document limit
+  const docCount = await countDocumentsForAsset(assetId);
+  if (docCount >= org.max_documents_per_asset) {
+    return NextResponse.json(
+      { error: `Document limit reached (${org.max_documents_per_asset} max per asset)` },
+      { status: 403 }
+    );
+  }
+
+  // Enforce org-wide document limit
+  const totalDocs = await countDocumentsForOrg(org.id);
+  if (totalDocs >= org.max_total_documents) {
+    return NextResponse.json(
+      { error: `Organisation document limit reached (${org.max_total_documents} max)` },
+      { status: 403 }
+    );
   }
 
   let body: z.infer<typeof bodySchema>;
