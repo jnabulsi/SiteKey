@@ -17,6 +17,9 @@ export default async function AccessPage(props: Props) {
         {error === "invalid" && (
           <p className="text-sm text-red-600 dark:text-red-400">Invalid access code</p>
         )}
+        {error === "rate_limit" && (
+          <p className="text-sm text-red-600 dark:text-red-400">Too many attempts. Please try again later.</p>
+        )}
 
         <form method="POST" action="/api/access" className="space-y-4">
           <input type="hidden" name="next" value={next} />

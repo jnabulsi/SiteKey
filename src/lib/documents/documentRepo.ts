@@ -109,6 +109,21 @@ export async function setDocumentReplacing(documentId: string, orgId: string) {
   });
 }
 
+export async function findOrphanedUploads(maxAgeMs: number) {
+  const cutoff = new Date(Date.now() - maxAgeMs);
+  return prisma.document.findMany({
+    where: {
+      upload_status: { in: ["uploading", "replacing"] },
+      uploaded_at: { lt: cutoff },
+    },
+    select: { id: true, storage_key: true },
+  });
+}
+
+export async function deleteDocumentById(documentId: string) {
+  return prisma.document.delete({ where: { id: documentId } });
+}
+
 export async function finalizeReplaceDocument(
   documentId: string,
   orgId: string,

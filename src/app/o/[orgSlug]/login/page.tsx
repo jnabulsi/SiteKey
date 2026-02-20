@@ -35,6 +35,9 @@ export default async function AdminLoginPage(props: Props) {
         {error === "invalid" && (
           <p className="text-sm text-red-600 dark:text-red-400">Invalid password</p>
         )}
+        {error === "rate_limit" && (
+          <p className="text-sm text-red-600 dark:text-red-400">Too many attempts. Please try again later.</p>
+        )}
 
         <form method="POST" action={`/api/o/${encodeURIComponent(orgSlug)}/login`} className="space-y-4">
           <div>

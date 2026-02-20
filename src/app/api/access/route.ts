@@ -1,12 +1,29 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { findAssetByPublicToken } from "@/lib/assets/assetRepo";
 import { createFieldSession } from "@/lib/auth/sessionRepo";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/constants";
 import { prisma } from "@/lib/db/prisma";
 import { verifyPassword } from "@/lib/auth/passwords";
+import { checkRateLimit } from "@/lib/rateLimit/rateLimit";
+
+const ACCESS_MAX = 10;
+const ACCESS_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 
 export async function POST(req: Request) {
+  const hdrs = await headers();
+  const ip =
+    hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    hdrs.get("x-real-ip") ||
+    "unknown";
+
+  const rl = await checkRateLimit(`access:${ip}`, ACCESS_MAX, ACCESS_WINDOW_MS);
+  if (!rl.allowed) {
+    const url = new URL("/access", req.url);
+    url.searchParams.set("error", "rate_limit");
+    return NextResponse.redirect(url, { status: 303 });
+  }
+
   const formData = await req.formData();
 
   const accessCode = String(formData.get("accessCode") ?? "");
@@ -41,6 +58,7 @@ export async function POST(req: Request) {
   cookieStore.set({
     name: SESSION_COOKIE_NAME,
     httpOnly: true,
+    secure: true,
     value: rawToken,
     sameSite: "lax",
     path: "/",

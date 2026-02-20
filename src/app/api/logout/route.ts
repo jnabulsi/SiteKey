@@ -21,6 +21,7 @@ export async function POST(req: Request) {
     name: SESSION_COOKIE_NAME,
     value: "",
     httpOnly: true,
+    secure: true,
     sameSite: "lax",
     path: "/",
     expires: new Date(0),

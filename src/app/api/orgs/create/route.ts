@@ -88,6 +88,7 @@ export async function POST(req: Request) {
     name: SESSION_COOKIE_NAME,
     value: rawToken,
     httpOnly: true,
+    secure: true,
     sameSite: "lax",
     path: "/",
     expires: expiresAt,
