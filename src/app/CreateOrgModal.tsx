@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState, type ChangeEvent } from "react";
 import { slugify } from "@/lib/org/slugValidation";
+import { createOrg } from "./createOrgAction";
 
 type Props = {
   open: boolean;
@@ -71,11 +72,7 @@ export default function CreateOrgModal({ open, onClose, error }: Props) {
           </div>
         )}
 
-        <form
-          action="/api/orgs/create"
-          method="POST"
-          className="space-y-4"
-        >
+        <form action={createOrg} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="orgDisplayName">
               Organisation Name
@@ -85,7 +82,7 @@ export default function CreateOrgModal({ open, onClose, error }: Props) {
               id="orgDisplayName"
               name="name"
               type="text"
-              placeholder="Acme Electrical"
+              placeholder="my-organisation"
               required
               maxLength={200}
               onChange={handleNameChange}
@@ -101,7 +98,7 @@ export default function CreateOrgModal({ open, onClose, error }: Props) {
               id="orgSlug"
               name="slug"
               type="text"
-              placeholder="acme-electrical"
+              placeholder="my-organisation"
               required
               maxLength={50}
               value={slug}

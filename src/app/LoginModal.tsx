@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useEffect, type FormEvent } from "react";
+import { useRef, useEffect } from "react";
+import { adminLogin } from "./loginAction";
 
 type Props = {
   open: boolean;
@@ -9,29 +10,16 @@ type Props = {
 
 export default function LoginModal({ open, onClose }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
   const orgRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
       dialogRef.current?.showModal();
-      // Focus org field when modal opens
       setTimeout(() => orgRef.current?.focus(), 0);
     } else {
       dialogRef.current?.close();
     }
   }, [open]);
-
-  function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    const data = new FormData(formRef.current!);
-    const org = String(data.get("org") ?? "").trim().toLowerCase();
-    const password = String(data.get("password") ?? "");
-    if (!org || !password) return;
-
-    formRef.current!.action = `/api/o/${encodeURIComponent(org)}/login`;
-    formRef.current!.submit();
-  }
 
   return (
     <dialog
@@ -52,12 +40,7 @@ export default function LoginModal({ open, onClose }: Props) {
           </button>
         </div>
 
-        <form
-          ref={formRef}
-          method="POST"
-          onSubmit={handleSubmit}
-          className="space-y-4"
-        >
+        <form action={adminLogin} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="orgName">
               Organisation
