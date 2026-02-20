@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db/prisma";
 import { findOrgBySlug } from "@/lib/org/orgRepo";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { requireAdminSession } from "@/lib/auth/requireAdminSession";
 import DocumentUploadForm from "./DocumentUploadForm";
 import DocumentActions from "./DocumentActions";
 
@@ -20,6 +21,39 @@ export default async function EditAssetPage(props: Props) {
     where: { id: assetId, org_id: org.id },
   });
   if (!asset) notFound();
+
+  async function updateAsset(formData: FormData) {
+    "use server";
+    const fetchedOrg = await findOrgBySlug(orgSlug);
+    if (!fetchedOrg) notFound();
+    await requireAdminSession(fetchedOrg.id, orgSlug);
+
+    const name = String(formData.get("name") ?? "").trim().slice(0, 200);
+    const location = String(formData.get("location") ?? "").trim().slice(0, 200);
+    const notes = String(formData.get("notes") ?? "").trim().slice(0, 2000);
+    const isPublic = formData.get("is_public") === "on";
+
+    if (!name) {
+      redirect(`/o/${encodeURIComponent(orgSlug)}/admin/assets/${encodeURIComponent(assetId)}?error=name`);
+    }
+
+    await prisma.asset.updateMany({
+      where: { id: assetId, org_id: fetchedOrg.id },
+      data: { name, location: location || null, notes: notes || null, is_public: isPublic },
+    });
+
+    redirect(`/o/${encodeURIComponent(orgSlug)}/admin/assets`);
+  }
+
+  async function deleteAsset() {
+    "use server";
+    const fetchedOrg = await findOrgBySlug(orgSlug);
+    if (!fetchedOrg) notFound();
+    await requireAdminSession(fetchedOrg.id, orgSlug);
+
+    await prisma.asset.deleteMany({ where: { id: assetId, org_id: fetchedOrg.id } });
+    redirect(`/o/${encodeURIComponent(orgSlug)}/admin/assets`);
+  }
 
   return (
     <>
@@ -48,13 +82,7 @@ export default async function EditAssetPage(props: Props) {
         <p className="text-sm text-red-600 dark:text-red-400 mb-4">Name is required</p>
       )}
 
-      <form
-        method="POST"
-        action={`/api/o/${encodeURIComponent(orgSlug)}/admin/assets/${encodeURIComponent(assetId)}`}
-        className="max-w-lg space-y-4"
-      >
-        <input type="hidden" name="action" value="update" />
-
+      <form action={updateAsset} className="max-w-lg space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1" htmlFor="name">
             Name
@@ -154,11 +182,7 @@ export default async function EditAssetPage(props: Props) {
 
       <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-10">
         <h2 className="text-lg font-medium text-red-600 dark:text-red-400 mb-3">Danger Zone</h2>
-        <form
-          method="POST"
-          action={`/api/o/${encodeURIComponent(orgSlug)}/admin/assets/${encodeURIComponent(assetId)}`}
-        >
-          <input type="hidden" name="action" value="delete" />
+        <form action={deleteAsset}>
           <button
             type="submit"
             className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-red-500 dark:hover:bg-red-600"

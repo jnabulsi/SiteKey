@@ -1,3 +1,15 @@
+import { redirect } from "next/navigation";
+import { cookies, headers } from "next/headers";
+import { findAssetByPublicToken } from "@/lib/assets/assetRepo";
+import { createFieldSession } from "@/lib/auth/sessionRepo";
+import { SESSION_COOKIE_NAME } from "@/lib/auth/constants";
+import { prisma } from "@/lib/db/prisma";
+import { verifyPassword } from "@/lib/auth/passwords";
+import { checkRateLimit } from "@/lib/rateLimit/rateLimit";
+
+const ACCESS_MAX = 10;
+const ACCESS_WINDOW_MS = 10 * 60 * 1000;
+
 type Props = {
   searchParams: Promise<{
     next?: string;
@@ -8,6 +20,54 @@ type Props = {
 
 export default async function AccessPage(props: Props) {
   const { next = "/", assetToken = "", error } = await props.searchParams;
+
+  async function access(formData: FormData) {
+    "use server";
+    const hdrs = await headers();
+    const ip =
+      hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      hdrs.get("x-real-ip") ||
+      "unknown";
+
+    const rl = await checkRateLimit(`access:${ip}`, ACCESS_MAX, ACCESS_WINDOW_MS);
+
+    const accessCode = String(formData.get("accessCode") ?? "");
+    const token = String(formData.get("assetToken") ?? "");
+    const nextUrl = String(formData.get("next") ?? "/");
+
+    function failRedirect(err: string): never {
+      const params = new URLSearchParams({ error: err });
+      if (token) params.set("assetToken", token);
+      if (nextUrl && nextUrl !== "/") params.set("next", nextUrl);
+      redirect(`/access?${params}`);
+    }
+
+    if (!rl.allowed) failRedirect("rate_limit");
+
+    const asset = await findAssetByPublicToken(token);
+    if (!asset) failRedirect("invalid");
+
+    const org = await prisma.organisation.findUnique({ where: { id: asset.org_id } });
+    if (!org) failRedirect("invalid");
+
+    const valid = await verifyPassword(accessCode, org.access_code_hash);
+    if (!valid) failRedirect("invalid");
+
+    const { rawToken, expiresAt } = await createFieldSession(org.id);
+    const cookieStore = await cookies();
+    cookieStore.set({
+      name: SESSION_COOKIE_NAME,
+      httpOnly: true,
+      secure: true,
+      value: rawToken,
+      sameSite: "lax",
+      path: "/",
+      expires: expiresAt,
+    });
+
+    const safeNext = nextUrl.startsWith("/") ? nextUrl : "/";
+    redirect(safeNext);
+  }
 
   return (
     <main className="flex min-h-screen items-center justify-center px-4">
@@ -21,7 +81,7 @@ export default async function AccessPage(props: Props) {
           <p className="text-sm text-red-600 dark:text-red-400">Too many attempts. Please try again later.</p>
         )}
 
-        <form method="POST" action="/api/access" className="space-y-4">
+        <form action={access} className="space-y-4">
           <input type="hidden" name="next" value={next} />
           <input type="hidden" name="assetToken" value={assetToken} />
 

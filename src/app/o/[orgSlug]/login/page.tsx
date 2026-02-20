@@ -1,12 +1,19 @@
 import { findOrgBySlug } from "@/lib/org/orgRepo";
 import { getSession } from "@/lib/auth/getSession";
 import { redirect, notFound } from "next/navigation";
+import { cookies, headers } from "next/headers";
+import { SESSION_COOKIE_NAME } from "@/lib/auth/constants";
+import { createAdminSession } from "@/lib/auth/sessionRepo";
+import { verifyPassword } from "@/lib/auth/passwords";
+import { checkRateLimit } from "@/lib/rateLimit/rateLimit";
+
+const LOGIN_MAX = 10;
+const LOGIN_WINDOW_MS = 10 * 60 * 1000;
 
 type Props = {
   params: Promise<{ orgSlug: string }>;
   searchParams: Promise<{ error?: string }>;
 };
-
 
 export default async function AdminLoginPage(props: Props) {
   const { orgSlug } = await props.params;
@@ -15,7 +22,6 @@ export default async function AdminLoginPage(props: Props) {
   if (!org) notFound();
 
   const session = await getSession();
-
   const { error } = await props.searchParams;
 
   if (
@@ -24,6 +30,45 @@ export default async function AdminLoginPage(props: Props) {
     session.org_id === org.id &&
     session.expires_at > new Date()
   ) {
+    redirect(`/o/${encodeURIComponent(orgSlug)}/admin/assets`);
+  }
+
+  async function login(formData: FormData) {
+    "use server";
+    const hdrs = await headers();
+    const ip =
+      hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      hdrs.get("x-real-ip") ||
+      "unknown";
+
+    const rl = await checkRateLimit(`login:${ip}`, LOGIN_MAX, LOGIN_WINDOW_MS);
+    if (!rl.allowed) {
+      redirect(`/o/${encodeURIComponent(orgSlug)}/login?error=rate_limit`);
+    }
+
+    const password = String(formData.get("password") ?? "");
+    const fetchedOrg = await findOrgBySlug(orgSlug);
+    if (!fetchedOrg) {
+      redirect(`/o/${encodeURIComponent(orgSlug)}/login?error=invalid`);
+    }
+
+    const valid = await verifyPassword(password, fetchedOrg.admin_password_hash);
+    if (!valid) {
+      redirect(`/o/${encodeURIComponent(orgSlug)}/login?error=invalid`);
+    }
+
+    const { rawToken, expiresAt } = await createAdminSession(fetchedOrg.id);
+    const cookieStore = await cookies();
+    cookieStore.set({
+      name: SESSION_COOKIE_NAME,
+      value: rawToken,
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      expires: expiresAt,
+    });
+
     redirect(`/o/${encodeURIComponent(orgSlug)}/admin/assets`);
   }
 
@@ -39,7 +84,7 @@ export default async function AdminLoginPage(props: Props) {
           <p className="text-sm text-red-600 dark:text-red-400">Too many attempts. Please try again later.</p>
         )}
 
-        <form method="POST" action={`/api/o/${encodeURIComponent(orgSlug)}/login`} className="space-y-4">
+        <form action={login} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="password">
               Password

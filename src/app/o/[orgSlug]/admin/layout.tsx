@@ -1,7 +1,11 @@
 import { ReactNode } from "react";
 import { findOrgBySlug } from "@/lib/org/orgRepo";
 import { requireAdminSession } from "@/lib/auth/requireAdminSession";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { SESSION_COOKIE_NAME } from "@/lib/auth/constants";
+import { hashSessionToken } from "@/lib/auth/tokens";
+import { prisma } from "@/lib/db/prisma";
 
 type Props = {
   children: ReactNode;
@@ -17,6 +21,26 @@ export default async function AdminLayout(props: Props) {
 
   await requireAdminSession(org.id, orgSlug);
 
+  async function logout() {
+    "use server";
+    const cookieStore = await cookies();
+    const rawToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+    if (rawToken) {
+      const tokenHash = hashSessionToken(rawToken);
+      await prisma.session.deleteMany({ where: { session_token_hash: tokenHash } });
+    }
+    cookieStore.set({
+      name: SESSION_COOKIE_NAME,
+      value: "",
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      expires: new Date(0),
+    });
+    redirect(`/o/${orgSlug}/login`);
+  }
+
   return (
     <>
       <header className="border-b border-gray-200 dark:border-gray-700">
@@ -27,11 +51,7 @@ export default async function AdminLayout(props: Props) {
           </div>
 
           <nav className="flex items-center gap-4 text-sm">
-            <form
-              method="POST"
-              action={`/api/logout?next=/o/${encodeURIComponent(orgSlug)}/login`}
-              className="inline"
-            >
+            <form action={logout} className="inline">
               <button
                 type="submit"
                 className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:underline"
