@@ -23,7 +23,6 @@ export default function LandingPage() {
         </p>
         <p className="mt-5 max-w-lg text-base text-gray-500 dark:text-gray-400">
           QR codes that link physical assets to their technical documentation.
-          No app. No accounts. Just scan.
         </p>
 
         <div className="mt-10 flex items-center gap-4">
@@ -69,7 +68,7 @@ export default function LandingPage() {
               <p className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">3</p>
               <h3 className="font-medium mb-1">View the docs</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                PDFs load instantly on any phone. The right docs, the right asset, every time.
+                PDFs load instantly on any device.
               </p>
             </div>
           </div>
