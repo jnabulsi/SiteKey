@@ -4,6 +4,8 @@ import {
   deleteDocumentById,
 } from "@/lib/documents/documentRepo";
 import { deleteObject } from "@/lib/s3/server";
+import { deleteExpiredSessions } from "@/lib/auth/sessionRepo";
+import { deleteExpiredOrganisations } from "@/lib/org/orgRepo";
 
 const ORPHAN_MAX_AGE_MS = 60 * 60 * 1000; // 1 hour
 
@@ -32,5 +34,15 @@ export async function POST(req: Request) {
     }
   }
 
-  return NextResponse.json({ found: orphans.length, deleted, errors });
+  const expiredSessions = await deleteExpiredSessions();
+
+  // Delete expired demo orgs (cascade deletes assets, documents, sessions).
+  // Demo documents point to shared demo/ S3 keys — no S3 deletion needed.
+  const expiredOrgs = await deleteExpiredOrganisations();
+
+  return NextResponse.json({
+    orphanedDocuments: { found: orphans.length, deleted, errors },
+    expiredSessions: { deleted: expiredSessions },
+    expiredOrganisations: { deleted: expiredOrgs },
+  });
 }

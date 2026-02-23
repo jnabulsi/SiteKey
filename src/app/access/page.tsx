@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Access",
+};
 import { cookies, headers } from "next/headers";
 import { findAssetByPublicToken } from "@/lib/assets/assetRepo";
 import { createFieldSession } from "@/lib/auth/sessionRepo";

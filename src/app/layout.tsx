@@ -16,8 +16,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SiteKey",
-  description: "Asset documentation access",
+  title: {
+    default: "SiteKey",
+    template: "%s | SiteKey",
+  },
+  description:
+    "Link physical assets to their technical documentation via QR codes. Fast, secure field access for technicians.",
+  openGraph: {
+    title: "SiteKey",
+    description:
+      "Link physical assets to their technical documentation via QR codes.",
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

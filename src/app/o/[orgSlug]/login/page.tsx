@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import { findOrgBySlug } from "@/lib/org/orgRepo";
+
+export const metadata: Metadata = {
+  title: "Admin Login",
+};
 import { getSession } from "@/lib/auth/getSession";
 import { redirect, notFound } from "next/navigation";
 import { cookies, headers } from "next/headers";

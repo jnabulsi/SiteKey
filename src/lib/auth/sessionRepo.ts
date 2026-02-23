@@ -56,6 +56,13 @@ export async function createAdminSession(orgId: string) {
   });
 }
 
+export async function deleteExpiredSessions(): Promise<number> {
+  const result = await prisma.session.deleteMany({
+    where: { expires_at: { lt: new Date() } },
+  });
+  return result.count;
+}
+
 export async function findValidSessionByRawToken(rawToken: string) {
   const tokenHash = hashSessionToken(rawToken);
   const session = await prisma.session.findUnique({

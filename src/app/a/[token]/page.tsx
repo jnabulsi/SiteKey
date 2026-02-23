@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect, notFound } from "next/navigation";
 import { findAssetByPublicToken } from "@/lib/assets/assetRepo";
 import { getSession } from "@/lib/auth/getSession";
@@ -6,6 +7,12 @@ import { listReadyDocumentsForAsset } from "@/lib/documents/documentRepo";
 type Props = {
   params: Promise<{ token: string }>;
 };
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const { token } = await props.params;
+  const asset = await findAssetByPublicToken(token);
+  return { title: asset ? asset.name : "Asset" };
+}
 
 function DocumentList({
   documents,

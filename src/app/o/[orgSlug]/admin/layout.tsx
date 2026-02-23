@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/constants";
 import { hashSessionToken } from "@/lib/auth/tokens";
 import { prisma } from "@/lib/db/prisma";
+import DemoBanner from "./DemoBanner";
 
 type Props = {
   children: ReactNode;
@@ -20,6 +21,8 @@ export default async function AdminLayout(props: Props) {
   if (!org) notFound();
 
   await requireAdminSession(org.id, orgSlug);
+
+  const isDemo = org.expires_at !== null;
 
   async function logout() {
     "use server";
@@ -43,6 +46,7 @@ export default async function AdminLayout(props: Props) {
 
   return (
     <>
+      {isDemo && <DemoBanner expiresAt={org.expires_at!.toISOString()} />}
       <header className="border-b border-gray-200 dark:border-gray-700">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">

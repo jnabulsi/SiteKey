@@ -29,3 +29,31 @@ export async function createOrganisation(data: {
   });
 }
 
+export async function createDemoOrganisation(data: {
+  name: string;
+  slug: string;
+  adminPasswordHash: string;
+  accessCodeHash: string;
+  expiresAt: Date;
+}) {
+  return prisma.organisation.create({
+    data: {
+      name: data.name,
+      slug: data.slug,
+      admin_password_hash: data.adminPasswordHash,
+      access_code_hash: data.accessCodeHash,
+      max_assets: 3,
+      max_documents_per_asset: 3,
+      max_total_documents: 5,
+      expires_at: data.expiresAt,
+    },
+  });
+}
+
+export async function deleteExpiredOrganisations(): Promise<number> {
+  const result = await prisma.organisation.deleteMany({
+    where: { expires_at: { not: null, lt: new Date() } },
+  });
+  return result.count;
+}
+

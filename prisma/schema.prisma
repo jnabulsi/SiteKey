@@ -16,6 +16,7 @@ model Organisation {
   max_assets              Int      @default(10)
   max_documents_per_asset Int      @default(10)
   max_total_documents     Int      @default(50)
+  expires_at              DateTime? @db.Timestamptz(6)
   created_at              DateTime @default(now()) @db.Timestamptz(6)
   updated_at              DateTime @updatedAt @db.Timestamptz(6)
   assets              Asset[]

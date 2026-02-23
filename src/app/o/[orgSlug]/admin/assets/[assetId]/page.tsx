@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/db/prisma";
 import { findOrgBySlug } from "@/lib/org/orgRepo";
 import { notFound, redirect } from "next/navigation";
@@ -9,6 +10,17 @@ type Props = {
   params: Promise<{ orgSlug: string; assetId: string }>;
   searchParams: Promise<{ error?: string }>;
 };
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const { orgSlug, assetId } = await props.params;
+  const org = await findOrgBySlug(orgSlug);
+  if (!org) return { title: "Asset" };
+  const asset = await prisma.asset.findFirst({
+    where: { id: assetId, org_id: org.id },
+    select: { name: true },
+  });
+  return { title: asset ? `${asset.name} — Edit` : "Asset" };
+}
 
 export default async function EditAssetPage(props: Props) {
   const { orgSlug, assetId } = await props.params;

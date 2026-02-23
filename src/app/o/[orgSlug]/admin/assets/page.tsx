@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import { findAssetsForOrg } from "@/lib/assets/assetRepo";
+
+export const metadata: Metadata = {
+  title: "Assets",
+};
 import { findOrgBySlug } from "@/lib/org/orgRepo";
 import { notFound } from "next/navigation";
 

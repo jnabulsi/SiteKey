@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import LoginModal from "./LoginModal";
 import CreateOrgModal from "./CreateOrgModal";
+import { tryDemo } from "./tryDemoAction";
 
 export default function LandingPage() {
   const [loginOpen, setLoginOpen] = useState(false);
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
   const [createOrgOpen, setCreateOrgOpen] = useState(!!error);
+  const [demoPending, startDemoTransition] = useTransition();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -25,11 +27,19 @@ export default function LandingPage() {
           QR codes that link physical assets to their technical documentation.
         </p>
 
-        <div className="mt-10 flex items-center gap-4">
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <button
+            type="button"
+            onClick={() => startDemoTransition(() => tryDemo())}
+            disabled={demoPending}
+            className="rounded-md bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50"
+          >
+            {demoPending ? "Setting up demo..." : "Try demo"}
+          </button>
           <button
             type="button"
             onClick={() => setLoginOpen(true)}
-            className="rounded-md bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600"
+            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-6 py-2.5 text-sm font-medium shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             Log in
           </button>
